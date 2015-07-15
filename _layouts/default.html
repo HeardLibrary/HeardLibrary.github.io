@@ -1,50 +1,42 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Vanderbilt University Library Github Repository</title>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-        <link rel="stylesheet" href="stylesheets/vustyles.css" />
+        <link rel="stylesheet" href="/stylesheets/vustyles.css" />
         <link rel="stylesheet"
             href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.4/cosmo/bootstrap.min.css" />
     </head>
     <body>
-        <nav class="navbar navbar-default ">
-            <div class="container">
-              <a href="http://rdf.library.vanderbilt.edu/"><img src="http://www.library.vanderbilt.edu/assets/images/logo-vandy-library.png"></a>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="http://www.library.vanderbilt.edu/"><img src="http://www.library.vanderbilt.edu/assets/images/logo-vandy-library.png"></a>
                 </div>
-                <div id="navbar" class="collapse navbar-collapse">
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
-                        <li class="active"><a href="#">Home</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                        <li class="active"><a href="/">Home <span class="sr-only"
+                                >(current)</span></a></li>
+                        <li><a href="/about.html">About</a></li>
+                        <li><a href="/workshops.html">Workshops</a></li>
                     </ul>
-                </div><!--/.nav-collapse -->
-            </div>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
         </nav>
         <div class="container">
             <div class="starter-template">
-                <div class="bs-component">
-                    <div class="jumbotron">
-                        <h2> {{ site.name }} </h2>
-                        <p><img class="img-responsive"
-                                src="http://www.library.vanderbilt.edu/webimages/Bioimages/magnolia.jpg"
-                             /></p>
-                        <form action="http://bioimages.vanderbilt.edu/">
-                            <input
-                                style="color: #FFFFFF; font-size:170%; background-color: #0099FF; font-weight: normal;"
-                                type="submit" name="submit" value="Learn More" id="submit" />
-                        </form>
-                    </div>
-                    <div id="div1"> {{ content }} </div>
-                </div>
+                <div class="bs-component"> {{ content }} </div>
             </div><!-- /.container -->
         </div>
     </body>
