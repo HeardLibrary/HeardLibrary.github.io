@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title> Get started with validating XML </title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1> Get Started with... </h1>
+        <h2>Learn digital humanities tools &amp; tech with me.</h2>
+        <a href="https://github.com/CliffordAnderson/" class="button"><small>Follow me on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+
+          <h1>Get started with validating XML</h1>
+<p class="meta">09 Nov 2014</p>
+
+<h2>Goals</h2>
+
+<p>My goal in this session is to review the various means to validate an XML document. We&#39;ll look at DTDs and XML Schema first and then briefly try out RELAX NG and Schematron. I&#39;m not aiming to teach you how to use these technologies--trust me, there are whole books on the subject. Rather, I want you to be aware of the similarities and differences as well as how the technologies complement one another.</p>
+
+<h2>Validation</h2>
+
+<p>Let&#39;s recall from our XML fundamentals the difference between checking whether any given XML document is well-formed and whether it is valid. The first asks whether the document is XML. If a document is not well-formed, then it isn&#39;t actually XML–even if it appears to have lots of angle brackets. The second checks whether the document conforms, as stated, to a particular grammar or set of rules for a specific kind of XML document.</p>
+
+<p>There are multiple ways to validate XML documents:</p>
+
+<ul>
+<li><a href="http://www.w3.org/TR/REC-xml/#dt-doctype">DTDs</a></li>
+<li><a href="http://www.w3.org/TR/xmlschema11-1/">XML Schema</a></li>
+<li><a href="http://relaxng.org/">RELAX NG</a></li>
+<li><a href="http://www.schematron.com/">Schematron</a></li>
+</ul>
+
+<p>as well as technologies like Namespace-based Validation Dispatching Language (<a href="http://nvdl.org/">NVDL</a>) to handle more advanced scenarios.</p>
+
+<h2>Sample Document</h2>
+
+<p>So let&#39;s imagine we&#39;re seeking a standardized way of describing books in a bookstore. We&#39;d like to create a standard that contains all the information we need along with some optional information that we might have in certain circumstances. We&#39;ll use this standard for a few things. It will help to make sure that our employees are all entering information in the same manner. It will flag cases where someone has left out important information. It will also help us to send information about our inventory to publishers and others.</p>
+
+<p>Here&#39;s a sketch of what such a document based on this standard might look like:</p>
+
+<p><em>N.B. These examples are modified and expanded versions of the corresponding examples in <a href="http://www.amazon.com/Beginning-XML-5th-Edition-Fawcett/dp/1118162137">Beginning XML</a>. Of course, if you really needed a schema for exchanging information about retail books, you&#39;d probably want to consider <a href="http://www.editeur.org/93/Release-3.0-Downloads/#Schema%20defs">ONIX</a>.</em></p>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;book</span> <span class="na">isbn=</span><span class="s">&quot;0099470438&quot;</span> <span class="na">oclc=</span><span class="s">&quot;50604879&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;author</span> <span class="na">authorized=</span><span class="s">&quot;Haddon, Mark&quot;</span><span class="nt">&gt;</span>Mark Haddon<span class="nt">&lt;/author&gt;</span>
+    <span class="nt">&lt;title</span> <span class="na">short=</span><span class="s">&quot;curious incident&quot;</span><span class="nt">&gt;</span>The curious incident of the dog in the night-time<span class="nt">&lt;/title&gt;</span>
+    <span class="nt">&lt;date</span> <span class="na">type=</span><span class="s">&quot;publication&quot;</span><span class="nt">&gt;</span>2003<span class="nt">&lt;/date&gt;</span>
+    <span class="nt">&lt;genre/&gt;</span>
+    <span class="nt">&lt;publisher&gt;</span>
+        <span class="nt">&lt;name&gt;</span>Doubleday<span class="nt">&lt;/name&gt;</span>
+        <span class="nt">&lt;city&gt;</span>New York<span class="nt">&lt;/city&gt;</span>
+    <span class="nt">&lt;/publisher&gt;</span>
+    <span class="nt">&lt;price&gt;</span>$14.95<span class="nt">&lt;/price&gt;</span>
+<span class="nt">&lt;/book&gt;</span></code></pre></div>
+
+<h2>Document Type Definition (DTD)</h2>
+
+<p>A document type definition (DTD) is a venerable standard developed to validate Standard Generalized Markup Language (<a href="http://www.iso.org/iso/catalogue_detail?csnumber=16387">SGML</a>). The standard predates the development of XML and XML-related schema standards like XML Schema.</p>
+
+<p>The benefits of using a Document Type Definition include its simplicity and relative compactness along with its ability to be used internally or externally to XML documents.</p>
+
+<h3>Example DTD for Book.xml</h3>
+
+<p>Here is a possible DTD for our sample document:</p>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="cp">&lt;!ELEMENT book (author*, title, date, genre?, publisher?, price?)&gt;</span>
+<span class="cp">&lt;!ATTLIST book isbn CDATA #IMPLIED&gt;</span>
+<span class="cp">&lt;!ATTLIST book oclc CDATA #REQUIRED&gt;</span>
+
+<span class="cp">&lt;!ELEMENT author (#PCDATA)&gt;</span>
+<span class="cp">&lt;!ATTLIST author authorized CDATA #REQUIRED&gt;</span>
+
+<span class="cp">&lt;!ELEMENT title (#PCDATA)&gt;</span>
+<span class="cp">&lt;!ATTLIST title short CDATA #REQUIRED&gt;</span>
+
+<span class="cp">&lt;!ELEMENT date (#PCDATA)&gt;</span>
+<span class="cp">&lt;!ATTLIST date type CDATA #IMPLIED&gt;</span>
+
+<span class="cp">&lt;!ELEMENT genre (#PCDATA)&gt;</span>
+<span class="cp">&lt;!ELEMENT publisher (name, city?)&gt;</span>
+<span class="cp">&lt;!ELEMENT price (#PCDATA)&gt;</span>
+
+<span class="cp">&lt;!ELEMENT name (#PCDATA)&gt;</span>
+<span class="cp">&lt;!ELEMENT city (#PCDATA)&gt;</span></code></pre></div>
+
+<ul>
+<li>N.B. PCDATA stands for Parsed Character Data, which is data that will be parsed by the XML interpreter. CDATA stands for Character Data. It will not be parsed as XML, meaning that elements etc. will not be recognized as such. See StackOverflow for a good discussion of the <a href="http://stackoverflow.com/questions/918450/difference-between-pcdata-and-cdata-in-dtd">difference between CDATA and PCDATA</a>.</li>
+</ul>
+
+<p>To associate this DTD with our sample XML document, add the following line to the top of the document (right under the XML Declaration)–assuming that the DTD is located in the same directory as the XML document:</p>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="cp">&lt;!DOCTYPE book SYSTEM &quot;book.dtd&quot;&gt;</span></code></pre></div>
+
+<p>Another common use of DTDs is to declare character entities. This allows you to substitute a unicode character, for example, for an entity reference. For example, let&#39;s see how you might declare a character entity for the Greek letter Alpha in an XML document</p>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="cp">&lt;!DOCTYPE example</span>
+<span class="cp">    [</span>
+<span class="cp">        &lt;!ENTITY Alpha &quot;&amp;#913;&quot;&gt;</span>
+    ]
+&gt;
+<span class="nt">&lt;example&gt;</span>
+    The first letter of the Greek alphabet is <span class="ni">&amp;Alpha;</span>.
+<span class="nt">&lt;/example&gt;</span></code></pre></div>
+
+<p>The downside to this approach is that your XML documents may become more difficult to read and, if you use external entity declarations, slower to parse.</p>
+
+<h2>XML Schema (XSD)</h2>
+
+<p>XML Schema 1.0 is a W3C standard approved in 2001. The current recommendation for <a href="http://www.w3.org/TR/xmlschema11-1/">XML Schema 1.1</a> dates from 2012.</p>
+
+<p>XML Schema is a more robust standard than Document Type Definitions. Unlike DTDs, XML Schema can perform complex type checking on documents. In other words, XML Schema can verify that a date element actually contains a valid gYear.</p>
+
+<p>In fact, XQuery incorporates the types defined in the <a href="http://www.w3.org/TR/xmlschema-2/">XML Schema</a>. This is why atomic types in XQuery use the &#39;xs&#39; namespace prefix. The &#39;xs&#39; prefix is a common shorthand for the namespace &#39;http://www.w3.org/2001/XMLSchema&#39;.</p>
+
+<p>A major difference between DTDs and XML Schemas is that the former uses a non-XML Syntax whereas the later uses XML syntax. An advantage of using XML syntax is that XML Schemas can be manipulated by XML-aware tools. A disadvantage is the verbosity of its XML syntax.</p>
+
+<p>XML Schema has a reputation for being complex and difficult to understand. This arises, I think, from its incorporation of <a href="http://en.wikipedia.org/wiki/Object-oriented_programming">object-oriented</a> concepts such as encapsulation and inheritance.</p>
+
+<h2>Example XML Schema for Book.xml</h2>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;xs:schema</span> <span class="na">xmlns:xs=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema&quot;</span>
+    <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span> <span class="na">elementFormDefault=</span><span class="s">&quot;qualified&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;book&quot;</span> <span class="na">type=</span><span class="s">&quot;bookType&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;xs:complexType</span> <span class="na">name=</span><span class="s">&quot;bookType&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;xs:all&gt;</span>
+            <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;author&quot;</span> <span class="na">type=</span><span class="s">&quot;authorType&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;title&quot;</span> <span class="na">type=</span><span class="s">&quot;titleType&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;date&quot;</span> <span class="na">type=</span><span class="s">&quot;dateType&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;genre&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span> <span class="na">xsi:nillable=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;publisher&quot;</span> <span class="na">type=</span><span class="s">&quot;publisherType&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;price&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xs:all&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">&quot;isbn&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">&quot;oclc&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:integer&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/xs:complexType&gt;</span>
+    <span class="nt">&lt;xs:complexType</span> <span class="na">name=</span><span class="s">&quot;authorType&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;xs:simpleContent&gt;</span>
+            <span class="nt">&lt;xs:extension</span> <span class="na">base=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">&quot;authorized&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/xs:extension&gt;</span>
+        <span class="nt">&lt;/xs:simpleContent&gt;</span>
+    <span class="nt">&lt;/xs:complexType&gt;</span>
+    <span class="nt">&lt;xs:complexType</span> <span class="na">name=</span><span class="s">&quot;titleType&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;xs:simpleContent&gt;</span>
+            <span class="nt">&lt;xs:extension</span> <span class="na">base=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">&quot;short&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/xs:extension&gt;</span>
+        <span class="nt">&lt;/xs:simpleContent&gt;</span>
+    <span class="nt">&lt;/xs:complexType&gt;</span>
+    <span class="nt">&lt;xs:complexType</span> <span class="na">name=</span><span class="s">&quot;dateType&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;xs:simpleContent&gt;</span>
+            <span class="nt">&lt;xs:extension</span> <span class="na">base=</span><span class="s">&quot;xs:gYear&quot;</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;xs:attribute</span> <span class="na">name=</span><span class="s">&quot;type&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/xs:extension&gt;</span>
+        <span class="nt">&lt;/xs:simpleContent&gt;</span>
+    <span class="nt">&lt;/xs:complexType&gt;</span>
+    <span class="nt">&lt;xs:complexType</span> <span class="na">name=</span><span class="s">&quot;priceType&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;xs:simpleContent&gt;</span>
+            <span class="nt">&lt;xs:extension</span> <span class="na">base=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xs:simpleContent&gt;</span>
+    <span class="nt">&lt;/xs:complexType&gt;</span>
+    <span class="nt">&lt;xs:complexType</span> <span class="na">name=</span><span class="s">&quot;publisherType&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;xs:all&gt;</span>
+            <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;xs:element</span> <span class="na">name=</span><span class="s">&quot;city&quot;</span> <span class="na">type=</span><span class="s">&quot;xs:string&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/xs:all&gt;</span>
+    <span class="nt">&lt;/xs:complexType&gt;</span>
+<span class="nt">&lt;/xs:schema&gt;</span></code></pre></div>
+
+<p>To add a reference to an XML Schema, insert attributes into the document element as follows:</p>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;book</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+ <span class="na">xsi:noNamespaceSchemaLocation=</span><span class="s">&quot;book.xsd&quot;</span> <span class="na">isbn=</span><span class="s">&quot;0099470438&quot;</span> <span class="na">oclc=</span><span class="s">&quot;50604879&quot;</span><span class="nt">&gt;</span></code></pre></div>
+
+<ul>
+<li>N.B. that there is no namespace for this schema. We might have defined our schema in a namespace like &#39;http://xqueryinstitute/book&#39; and targeted this namespace using the <code>targetNamespace</code> attribute in our XSD. Of course, our document would also have to declare this namespace. In such cases, we would use the attribute <code>xsi:schemaLocation</code> to identify our namespace and its location.</li>
+</ul>
+
+<p>A last thing to note about XML Schemas is that it provides primitive datatypes used in XQuery and XSLT. See the list of <a href="http://www.w3.org/TR/xmlschema-2/#built-in-datatypes">Built-in Datatypes</a> in the <a href="http://www.w3.org/TR/xmlschema-2/">XML Schema Part 2: Datatypes Second Edition</a> recommendation.</p>
+
+<h2>RELAX NG</h2>
+
+<p>RELAX NG stands for &quot;REgular LAnguage for XML Next Generation&quot;. James Clark, a major figure in the XML world, promoted the development of RELAX NG as a more streamlined alternative to XML Schema. The <a href="https://www.oasis-open.org/committees/relax-ng/compact-20021121.html">RELAX NG</a> standard is maintained by <a href="https://www.oasis-open.org/org">OASIS</a>.</p>
+
+<p>Among the <a href="http://relaxng.org/">stated goals of RELAX NG</a> are being simple and easy to learn. In a way, RELAX NG, especially in its compact syntax, draws on the legacy of DTDs while providing the powerful type checking of XML Schema.</p>
+
+<h3>Example RELAX NG (compact syntax) for Book.xml</h3>
+
+<p>Here&#39;s a RELAX NG file using the compact syntax to validate our book document:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">author =
+    element author {
+        attribute authorized {
+            xsd:token { pattern = &quot;([A-Z][a-z]*, [A-Z][a-z]* ?)+&quot; }
+        },
+        text
+    }
+title =
+    element title {
+        attribute short {
+            xsd:token { pattern = &quot;(\w* ?){1,3}&quot; }
+        },
+        text
+    }
+date =
+    element date {
+        attribute type { text },
+        xsd:gYear
+    }
+genre = element genre { text }
+publisher =
+    element publisher {
+        element name { text }
+        &amp; element city { text }
+    }
+price = element price { text }
+start =
+    element book {
+        attribute isbn { xsd:token }
+        &amp; attribute oclc { xsd:token }
+        &amp; title
+        &amp; author
+        &amp; date
+        &amp; genre
+        &amp; publisher
+        &amp; price
+    }
+</code></pre></div>
+<p>To associate this RELAX NG compact schema with an XML document, use the <code>xml-model</code> processing instruction as follows: <code>&lt;?xml-model href=&quot;book.rnc&quot; type=&quot;application/relax-ng-compact-syntax&quot;?&gt;</code></p>
+
+<h2>Schematron</h2>
+
+<p>Schematron allows you to specify more specific and complex rules for validating documents. Like RELAX NG, Schematron is not a W3C recommendation; the Schematron standard is maintained jointly by <a href="http://www.standardsinfo.net/info/index.html">ISO and IEC</a>.</p>
+
+<p>A key difference between DTDs, XML Schema, and RelaxNG on the one hand, and Schematron on the other is that the former are grammar-based whereas Schematron is rule-based. (See Priscilla Walmsley, <a href="http://www.worldcat.org/title/definitive-xml-schema/oclc/48362767">Definitive XML Schema</a>, second edition, p. 13)</p>
+
+<h3>Example Schematron document for Book.xml</h3>
+
+<p>Here&#39;s a Schematron file to perform additional validation on the contents</p>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;schema</span> <span class="na">schemaVersion=</span><span class="s">&quot;1.5&quot;</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.ascc.net/xml/schematron&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;ns</span> <span class="na">uri=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema&quot;</span> <span class="na">prefix=</span><span class="s">&quot;xs&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;pattern</span> <span class="na">name=</span><span class="s">&quot;author attributes&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;rule</span> <span class="na">context=</span><span class="s">&quot;author&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;assert</span> <span class="na">test=</span><span class="s">&quot;@authorized&quot;</span> <span class="na">diagnostics=</span><span class="s">&quot;authorized&quot;</span><span class="nt">&gt;</span>The authorized form of the name must
+                appear in an authorized attribute of the <span class="nt">&lt;name</span> <span class="na">path=</span><span class="s">&quot;.&quot;</span><span class="nt">/&gt;</span> element.<span class="nt">&lt;/assert&gt;</span>
+        <span class="nt">&lt;/rule&gt;</span>
+    <span class="nt">&lt;/pattern&gt;</span>
+    <span class="nt">&lt;pattern</span> <span class="na">name=</span><span class="s">&quot;publicationDate&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;rule</span> <span class="na">context=</span><span class="s">&quot;date&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;assert</span> <span class="na">test=</span><span class="s">&quot;text() castable as xs:gYear&quot;</span> <span class="na">diagnostics=</span><span class="s">&quot;publicationDate&quot;</span><span class="nt">&gt;</span>The publication
+                date must contain a valid year.<span class="nt">&lt;/assert&gt;</span>
+        <span class="nt">&lt;/rule&gt;</span>
+    <span class="nt">&lt;/pattern&gt;</span>
+    <span class="nt">&lt;diagnostics&gt;</span>
+        <span class="nt">&lt;diagnostic</span> <span class="na">id=</span><span class="s">&quot;authorized&quot;</span><span class="nt">&gt;</span>The &quot;authorized&quot; attribute is missing for this book: <span class="nt">&lt;value-of</span>
+                <span class="na">select=</span><span class="s">&quot;../title/text()&quot;</span><span class="nt">/&gt;&lt;/diagnostic&gt;</span>
+        <span class="nt">&lt;diagnostic</span> <span class="na">id=</span><span class="s">&quot;publicationDate&quot;</span><span class="nt">&gt;</span>The publication date is missing or invalid for this book:
+                <span class="nt">&lt;value-of</span> <span class="na">select=</span><span class="s">&quot;./text()&quot;</span><span class="nt">/&gt;&lt;/diagnostic&gt;</span>
+    <span class="nt">&lt;/diagnostics&gt;</span>
+<span class="nt">&lt;/schema&gt;</span></code></pre></div>
+
+<p>To associate a set of Schematron rules with an XML document, use the <code>xml-model</code> processing instruction like this <code>&lt;?xml-model href=&quot;book.sch&quot; type=&quot;application/xml&quot; schematypens=&quot;http://purl.oclc.org/dsdl/schematron&quot;?&gt;</code>. Schematron may be used in conjunction with grammar-based schemas; it&#39;s perfectly valid to have two <code>xml-model</code> instructions – for example,</p>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml-model href=&quot;book.rnc&quot; type=&quot;application/relax-ng-compact-syntax&quot;?&gt;</span>
+<span class="cp">&lt;?xml-model href=&quot;book.sch&quot; type=&quot;application/xml&quot; schematypens=&quot;http://purl.oclc.org/dsdl/schematron&quot;?&gt;</span></code></pre></div>
+
+<h2>Next Steps</h2>
+
+<p>The best way to get familiar with XML schemas is to try them out. Try writing a schema to validate the following (fictitious) check XML document. Select any form of schema (DTD, XSD, RELAX NG, or Schematron) to validate this kind of document.</p>
+
+<div class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;check</span> <span class="na">num=</span><span class="s">&quot;001&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;name&gt;</span>
+        <span class="nt">&lt;last&gt;</span>Smith<span class="nt">&lt;/last&gt;</span>
+        <span class="nt">&lt;first&gt;</span>Jane<span class="nt">&lt;/first&gt;</span>
+    <span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;address</span> <span class="na">type=</span><span class="s">&quot;personal&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;street&gt;</span>1 Banker&#39;s Plaza<span class="nt">&lt;/street&gt;</span>
+        <span class="nt">&lt;city&gt;</span>Gotham<span class="nt">&lt;/city&gt;</span>
+        <span class="nt">&lt;state&gt;</span>NY<span class="nt">&lt;/state&gt;</span>
+        <span class="nt">&lt;zip&gt;</span>10000<span class="nt">&lt;/zip&gt;</span>
+    <span class="nt">&lt;/address&gt;</span>
+    <span class="c">&lt;!--See http://en.wikipedia.org/wiki/Routing_transit_number--&gt;</span>
+    <span class="nt">&lt;routing</span> <span class="na">type=</span><span class="s">&quot;RTN&quot;</span><span class="nt">&gt;</span>111000025<span class="nt">&lt;/routing&gt;</span>
+    <span class="nt">&lt;transaction</span> <span class="na">currency=</span><span class="s">&quot;bitcoin&quot;</span> <span class="na">type=</span><span class="s">&quot;debit&quot;</span><span class="nt">&gt;</span>1<span class="nt">&lt;/transaction&gt;</span>
+    <span class="nt">&lt;payee&gt;</span>Acme Corporation<span class="nt">&lt;/payee&gt;</span>
+<span class="nt">&lt;/check&gt;</span></code></pre></div>
+
+<p>Think in particular about what aspects of this instance may vary in other instances. What datatypes would be helpful? Would it be useful to impose constraints on certain attributes?</p>
+
+
+
+        </section>
+
+        <aside id="sidebar">
+          <h2>About Me</h2>
+
+          <p>I'm Cliff Anderson, an academic librarian with an alt-ac perspective on the academy. In 2014, I was the project director of the XQuery Institute, an NEH-supported Institute for Advanced Topics in the Digital Humanities.</p>
+
+          <ul class="social-media-list">
+            
+            <li>
+              <a href="https://twitter.com/andersoncliffb">
+                <span class="icon  icon--twitter">
+                  <svg viewBox="0 0 16 16">
+                    <path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809
+                    c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/>
+                  </svg>
+                </span>
+
+                <span class="username">andersoncliffb</span>
+              </a>
+            </li>
+            
+            
+            <li>
+              <a href="https://github.com/CliffordAnderson">
+                <span class="icon  icon--github">
+                  <svg viewBox="0 0 16 16">
+                    <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+                  </svg>
+                </span>
+
+                <span class="username">CliffordAnderson</span>
+              </a>
+            </li>
+            
+          </ul>
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+          <p>
+            <img src="/images/by.png" width="200" height="37" alt="CC-BY"/>
+          </p>
+        </aside>
+      </div>
+    </div>
+
+  </body>
+</html>
