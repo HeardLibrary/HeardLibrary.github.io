@@ -1,12 +1,16 @@
 @charset "utf-8";
 /* CSS Document */
 
-body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
-}
+
+  html{
+    height: 100%;
+  }
+  body {
+    min-height: 100%;
+  }
+
 .footer {
-  position: fixed;
+  position: relative;
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
