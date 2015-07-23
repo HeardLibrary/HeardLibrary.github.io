@@ -9,6 +9,10 @@
     min-height: 100%;
   }
 
+.container {
+   min-height: 75%;
+}
+
 .footer {
   position: relative;
   bottom: 0;
